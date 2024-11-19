@@ -98,9 +98,13 @@ const Login = () => {
         </button>
       </form>
       <p className="mt-4 text-sm text-center">
-        Don’t have an account?{" "}
-        <a href="/register" className="text-blue-500 hover:underline">
-          Register
+      By using Ajuntatech you agree to the{" "}
+        <a href="#" className="text-blue-500 hover:underline">
+          Terms of service
+        </a>
+        {" "}and{" "}
+        <a href="#" className="text-blue-500 hover:underline">
+          Privacy Policy
         </a>
       </p>
     </div>

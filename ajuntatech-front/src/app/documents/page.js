@@ -1,4 +1,5 @@
-"use client" // pages/document-preview.js
+"use client";
+
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { FileInput, Button, Textarea, Label } from "flowbite-react";
@@ -21,16 +22,6 @@ const DocumentPreview = () => {
       setDocData([{ uri: savedDoc }]);
       setFileUploaded(true);
     }
-
-    // Limpiar el estado y el localStorage cuando el componente se desmonte
-    return () => {
-      setDocData([]);
-      setMessages([]);
-      setFile(null);
-      setMessage("");
-      setFileUploaded(false);
-      localStorage.removeItem("uploadedDoc");
-    };
   }, []);
 
   const handleFileChange = (e) => {
@@ -52,8 +43,16 @@ const DocumentPreview = () => {
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
-      setMessages([...messages, message]);
+      // Agrega el mensaje del usuario y una respuesta simulada del sistema
+      setMessages([...messages, { sender: "user", text: message }]);
       setMessage("");
+
+      setTimeout(() => {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { sender: "system", text: "Respuesta del sistema simulada." },
+        ]);
+      }, 1000);
     }
   };
 
@@ -61,8 +60,8 @@ const DocumentPreview = () => {
     <div className="flex flex-col min-h-screen p-4 space-y-6 bg-gray-100">
       <h1 className="text-2xl font-bold text-center">Document Preview & Chat</h1>
 
-      {/* Sección de carga de documentos */}
-      {!fileUploaded && (
+      {!fileUploaded ? (
+        // Sección de carga de documentos
         <div className="flex w-full items-center justify-center mb-6">
           <Label
             htmlFor="dropzone-file"
@@ -87,7 +86,9 @@ const DocumentPreview = () => {
               <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                 <span className="font-semibold">Click to upload</span> or drag and drop
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                SVG, PNG, JPG or GIF (MAX. 800x400px)
+              </p>
             </div>
             <FileInput
               id="dropzone-file"
@@ -96,49 +97,54 @@ const DocumentPreview = () => {
             />
           </Label>
         </div>
-      )}
+      ) : (
+        // División principal con chat y previsualización de documento
+        <div className="flex flex-col md:flex-row space-x-4">
+          {/* Sección de Chat */}
+          <div className="flex-2 border rounded-lg bg-white p-4 shadow h-full  overflow-auto">
+            <h2 className="text-lg font-semibold flex items-center space-x-2">
+              <BsChatDots />
+              <span>Chat</span>
+            </h2>
+            <div className="flex flex-col space-y-2 max-h-64 overflow-y-auto border-t pt-4">
+              {messages.length > 0 ? (
+                messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`p-2 rounded ${
+                      msg.sender === "user"
+                        ? "bg-blue-100 text-blue-800 self-end"
+                        : "bg-gray-200 text-gray-800 self-start"
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">No hay mensajes aún.</p>
+              )}
+            </div>
+            <div className="flex space-x-2 mt-4">
+              <Textarea
+                placeholder="Escribe un mensaje..."
+                value={message}
+                rows={1}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+              <Button onClick={handleSendMessage}>Enviar</Button>
+            </div>
+          </div>
 
-      {/* División principal con chat y previsualización de documento */}
-      <div className="flex flex-row space-x-4">
-        {/* Sección de Chat (2/3 del ancho) */}
-        <div className="flex-2 border rounded-lg bg-white p-4 shadow h-full max-h-[calc(100vh-160px)] overflow-auto">
-          <h2 className="text-lg font-semibold flex items-center space-x-2">
-            <BsChatDots />
-            <span>Chat</span>
-          </h2>
-
-          <div className="flex flex-col space-y-2 max-h-64 overflow-y-auto border-t pt-4">
-            {messages.length > 0 ? (
-              messages.map((msg, index) => (
-                <div key={index} className="p-2 rounded bg-blue-100 text-blue-800">
-                  {msg}
-                </div>
-              ))
+          {/* Sección de Previsualización del Documento */}
+          <div className="flex-1 border rounded-lg bg-white p-4 shadow h-full max-h-[calc(100vh-160px)] overflow-auto">
+            {/* {docData.length > 0 ? (
+              <DocViewer documents={docData} />
             ) : (
-              <p className="text-gray-500">No hay mensajes aún.</p>
-            )}
-          </div>
-
-          <div className="flex space-x-2 mt-4">
-            <Textarea
-              placeholder="Escribe un mensaje..."
-              value={message}
-              rows={1}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            <Button onClick={handleSendMessage}>Enviar</Button>
+              <p className="text-center text-gray-500">No hay documentos cargados.</p>
+            )} */}
           </div>
         </div>
-
-        {/* Sección de Previsualización del Documento (1/3 del ancho) */}
-        <div className="flex-1 border rounded-lg bg-white p-4 shadow h-full max-h-[calc(100vh-160px)] overflow-auto">
-          {docData.length > 0 ? (
-            <DocViewer documents={docData} />
-          ) : (
-            <p className="text-center text-gray-500">No hay documentos cargados.</p>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 };

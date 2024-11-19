@@ -17,11 +17,11 @@ export const CustomCard = ({ icon, id, title, link, description }) => {
       key={id}
       as={Link}
       href={link}
-      className="scale-100"
+      className=""
     >
       {/* Icono pegado a la izquierda */}
       <div className="flex items-start mb-4 gap-2">
-        <div className="mr-4 rounded-full transition-transform duration-300 transform hover:scale-110">
+        <div className="mr-4 rounded-full transition-transform duration-300  transform hover:scale-110">
           {icon}
         </div>
         
